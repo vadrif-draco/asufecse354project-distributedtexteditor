@@ -1,16 +1,18 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpEvent } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { DOCUMENT } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+
 
 @Injectable({
     providedIn: 'root'
 })
 export class DocumentEditorService {
 
-    constructor() { }
+    constructor(private httpClient: HttpClient) { }
 
-    outgoingUpdate(newData: string) {
-        // Send to server?
+    outgoingUpdate(dataDiff: any) {
+
+        this.httpClient.post<{ resp: string }>('http://localhost:3000/api/docs/document', { data: dataDiff })
+            .subscribe((response) => { console.log("Server sent: " + response.resp) });
+
     }
 }

@@ -28,6 +28,13 @@ middleware.use((request, response, nextuse) => {
     nextuse(); // To go to the following use() calls
 })
 
+middleware.post('/api/docs/document', (request, response, nextuse) => {
+    console.log(request.body) // Mongooooo
+    response.status(201).json({
+        resp: 'HELO'
+    })
+})
+
 middleware.post('/api/docs/my', (request, response, nextuse) => {
     console.log(request.body) // Later should extract its content and store into mongodb
     response.status(201).json({

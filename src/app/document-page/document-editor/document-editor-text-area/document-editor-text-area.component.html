@@ -3,12 +3,14 @@
     id="textarea"
     tabindex="-1"
     contenteditable
-    (keyup)="localChange($event, textarea)"
-    (mouseup)="localChange($event, textarea)"
+    (input)="trackTime()"
     [attr.spellcheck]="'true'">
     <br>
 </div>
-<!-- Other events that may be useful: input, focus/blur, copy?/paste -->
+<!-- (keyup)="localChange($event)" -->
+<!-- (mouseup)="localChange($event)" -->
+
+<!-- Other events that may be useful: focus/blur, copy?/paste -->
 
 <!-- <div *ngIf="textarea.innerHTML === ''">
     Write something...
