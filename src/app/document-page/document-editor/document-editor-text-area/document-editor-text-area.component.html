@@ -1,0 +1,15 @@
+ <div
+    #textarea
+    id="textarea"
+    tabindex="-1"
+    contenteditable
+    (keyup)="localChange($event, textarea)"
+    (mouseup)="localChange($event, textarea)"
+    [attr.spellcheck]="'true'">
+    <br>
+</div>
+<!-- Other events that may be useful: input, focus/blur, copy?/paste -->
+
+<!-- <div *ngIf="textarea.innerHTML === ''">
+    Write something...
+</div> -->

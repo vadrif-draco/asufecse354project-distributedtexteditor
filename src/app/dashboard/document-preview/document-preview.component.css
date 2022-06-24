@@ -1,0 +1,26 @@
+mat-card-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: medium;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+mat-card {
+    width: 12vw;
+    height: 32vh;
+}
+
+mat-card img {
+    width: 8vw;
+    height: 24vh;
+    margin: auto;
+    object-fit: cover;
+}
+
+mat-card button {
+    position: absolute;
+    transform: translateX(calc(12vw - 32px)) translateY(calc(32vh - 32px));
+}

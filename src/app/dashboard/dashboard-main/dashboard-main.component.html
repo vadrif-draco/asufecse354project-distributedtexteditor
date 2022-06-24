@@ -1,0 +1,20 @@
+<!-- Button should show up in small screens only -->
+<button id="folderbtn" mat-fab color="accent" (click)="drawer.toggle()">
+    <mat-icon>folder</mat-icon>
+</button>
+<!-- Backdrop should be true if small screen false otherwise -->
+<body>
+    <mat-drawer-container [hasBackdrop]="true">
+
+        <!-- Drawer mode should be over if small screen side otherwise -->
+        <mat-drawer #drawer [mode]="'over'">
+            <app-left-navbar></app-left-navbar>
+        </mat-drawer>
+
+        <mat-drawer-content>
+            <app-half-height-container [docsList]="myDocs"></app-half-height-container>
+            <app-half-height-container [docsList]="sharedDocs" [shared]="true"></app-half-height-container>
+        </mat-drawer-content>
+
+    </mat-drawer-container>
+</body>

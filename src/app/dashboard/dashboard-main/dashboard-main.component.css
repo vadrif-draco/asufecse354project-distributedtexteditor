@@ -1,0 +1,11 @@
+#folderbtn {
+    position: fixed;
+    margin: 1vh 1vw;
+    z-index: 2;
+}
+
+body * {
+    background-color: #f6f6f6;
+    height: 100vh;
+    overflow: auto;
+}

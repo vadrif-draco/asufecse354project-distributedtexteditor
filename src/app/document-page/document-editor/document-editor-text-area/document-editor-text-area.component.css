@@ -1,0 +1,9 @@
+div {
+    text-align: left;
+    background-color: white;
+    border: 1px solid #d8d8d8;
+    outline: none;
+    padding: 1vw;
+    width: 90vw;
+    min-height: 64vh;
+}

@@ -1,0 +1,32 @@
+div {
+    text-align: center;
+}
+
+div app-document-editor-text-area {
+    padding: 32px 16px;
+    display: inline-block;
+}
+
+app-document-editor-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* @keyframes hide {
+    from {
+        position: relative;
+        top: 0px;
+    }
+    to {
+        position: absolute;
+        top: -200px;
+    }
+} */
+
+/* .hidden {
+    position: absolute;
+    top: -200px;
+    animation-name: hide;
+    animation-duration: 0.5s;
+} */

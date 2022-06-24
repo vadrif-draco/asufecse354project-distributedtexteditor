@@ -1,27 +1,15 @@
-# Asufecse354projectDistributedtexteditor
+# Distributed Text Editor
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.0.2.
 
-## Development server
+## Commands
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- If you've just forked/cloned this repository, you must run `npm install` to install all of the required dependencies for it to run.
 
-## Code scaffolding
+- Run `ng serve` for a client-side dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- Run `npm run start:server` for the coressponding server-side dev server. Navigate to `http://localhost:3000/` to preview it if you wish, though the requests are done through the API routes -- i.e., nothing to preview in the root path. The application will automatically reload if you've installed nodemon successfully.
 
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
+- Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.

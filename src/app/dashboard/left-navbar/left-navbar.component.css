@@ -1,0 +1,6 @@
+div {
+    width: 80vw;
+    /* TODO: Change height to make it fit its constituent folders when the time comes */
+    height: 100%;
+    background-color: cornsilk;
+}

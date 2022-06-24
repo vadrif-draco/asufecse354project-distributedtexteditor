@@ -1,0 +1,13 @@
+<!-- Maximum 5 documents per view -->
+<!-- Need to add some pagination -->
+<mat-grid-list cols="4" rowHeight="48vh">
+        <mat-grid-tile *ngFor="let doc of docsList">
+            <app-document-preview [doc]="doc">
+            </app-document-preview>
+        </mat-grid-tile>
+        <mat-grid-tile *ngIf="!shared">
+            <button mat-mini-fab color="accent" style="transform: scale(2);" (click)="createNewDoc()">
+                <mat-icon matTooltip="Create a new document...">note_add</mat-icon>
+            </button>
+        </mat-grid-tile>
+</mat-grid-list>
