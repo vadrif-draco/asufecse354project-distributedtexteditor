@@ -16,6 +16,8 @@ sharedDocs = [
 // --------------------------------------------------------------------------------------------------------------------------------------
 
 const express = require('express');
+const mongoose = require("mongoose")
+const Document = require("./Document")
 const middleware = express();
 
 const WebSocket = require('ws').Server;
@@ -33,6 +35,33 @@ websocket.on('connection', socket => {
 
 });
 
+// connecting to database
+mongoose.connect("mongodb://localhost/database",
+    err => {
+        if(err) throw err;
+        console.log('connected to MongoDB')
+    });
+
+let documentStr = "";
+
+async function findOrCreateDocument(id) {
+    if (id == null) return
+  
+    const document = await Document.findById(id)
+    if (document) return document
+    return await Document.create({ _id: id, data: null })
+  }
+
+function applyChanges(input, changes) {
+    changes.forEach(change => {
+        if (change.type == 'insert') {
+            input.splice(change.index, 0, ...change.values);
+        } else if (change.type == 'delete') {
+            input.splice(change.index, change.howMany);
+        }
+    });
+}
+
 middleware.use((request, response, nextuse) => {
     response.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
     response.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS");
@@ -40,9 +69,19 @@ middleware.use((request, response, nextuse) => {
     nextuse(); // To go to the following use() calls
 })
 
-middleware.post('/api/docs/document', (request, response, nextuse) => {
+middleware.post('/api/docs/document', async (request, response, nextuse) => {
     console.log("Server received from client:") // Mongooooo
     console.log(request.body) // Mongooooo
+    var docId = 1;
+    const document = await findOrCreateDocument(docId);
+
+    var docArray = Array.from(documentStr);
+    applyChanges(docArray, request.body.data);
+    documentStr = docArray.join('');
+    console.log(documentStr);
+
+    await Document.findByIdAndUpdate(docId, {data: documentStr})
+
     response.status(201).json({
         resp: 'HELO'
     })
