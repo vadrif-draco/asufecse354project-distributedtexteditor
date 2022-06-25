@@ -1,3 +1,24 @@
+function applyChanges(input, changes) {
+
+    changes.forEach(change => {
+        if (change.type == 'insert') {
+            input.splice(change.index, 0, ...change.values);
+        } else if (change.type == 'delete') {
+            input.splice(change.index, change.howMany);
+        }
+    });
+
+}
+
+export function updateDocument(textAreaInnerHTML, dataDiff) {
+
+    var docArr = Array.from(textAreaInnerHTML)
+    applyChanges(docArr, dataDiff)
+
+    return docArr.join('')
+
+}
+
 /*
  * @param {Array|String} a Input array or string.
  * @param {Array|String} b Input array or string.

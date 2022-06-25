@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from "@angular/core";
-import { DocumentEditorService } from "../document-editor.service";
-import { fastDiff } from "./document-editor-text-area.fast-diff";
 import { Subscription } from 'rxjs';
+
+import { ClientWebSocketService } from '../../../client-web-socket.service';
+import { fastDiff, updateDocument } from "./document-editor-text-area.fast-diff";
 
 @Component({
     selector: "app-document-editor-text-area",
@@ -10,7 +11,11 @@ import { Subscription } from 'rxjs';
 })
 export class DocumentEditorTextAreaComponent implements OnInit, OnDestroy, AfterViewInit {
 
-    constructor(private _docEditService: DocumentEditorService) { }
+    constructor(private _clientSock: ClientWebSocketService) { }
+
+    ws!: WebSocket
+
+    incomingDataChange: boolean = false;
 
     lastChange: number = 0;
     prevState: string = ``;
@@ -21,21 +26,27 @@ export class DocumentEditorTextAreaComponent implements OnInit, OnDestroy, After
     ngOnInit(): void {
 
         // First we asynchronously initialize the websocket on which we will be listening (hard-coded to 3001 for now)
-        this._docEditService.initIncomingDataDiffListenerWebSocket("3001")
+        this._clientSock.initializeWebSocket("3000")
 
             // And when the websocket is ready...
             .subscribe((ws: WebSocket) => {
 
+                this.ws = ws
+
                 // Asynchronously setup the subscription which will update our document
-                this.incomingDiffSubscription = this._docEditService.createIncomingDataDiffListener(ws)
+                this.incomingDiffSubscription = this._clientSock.getWebSocketListener(ws)
 
                     // Which is required to use the dataDiff received via the websocket to update the local textarea
                     .subscribe((dataDiff: MessageEvent) => {
 
-                        let textarea = document.getElementById("textarea");
-                        console.log("Server also sent: ") // TODO: Actual parsing into textarea... Just logging it for now
+                        let textarea = document.getElementById("textarea")!;
+                        
+                        this.incomingDataChange = true
+                        
+                        // TODO: Actual parsing into textarea... Just logging it for now
+                        // console.log(dataDiff.data)
                         // console.log(JSON.parse(dataDiff))
-                        console.log(dataDiff.data)
+                        textarea.innerHTML = updateDocument(textarea.innerHTML, JSON.parse(dataDiff.data))
 
                     });
 
@@ -46,6 +57,7 @@ export class DocumentEditorTextAreaComponent implements OnInit, OnDestroy, After
     ngOnDestroy(): void {
 
         this.incomingDiffSubscription.unsubscribe();
+
 
     }
 
@@ -64,6 +76,14 @@ export class DocumentEditorTextAreaComponent implements OnInit, OnDestroy, After
 
     checkForChanges(textarea: HTMLElement): void {
 
+        if (this.incomingDataChange) {
+
+            this.incomingDataChange = false
+            this.prevState = textarea.innerHTML
+            return
+
+        }
+
         // anti-spam strategy...
 
         // if change is too fast (within the polling interval), skip it
@@ -76,7 +96,7 @@ export class DocumentEditorTextAreaComponent implements OnInit, OnDestroy, After
             if (this.prevState.localeCompare(textarea.innerHTML) != 0) {
 
                 var diff = fastDiff(this.prevState, textarea.innerHTML)
-                this._docEditService.outgoingUpdate(diff);
+                if (this.ws) this._clientSock.sendWebSocketData(this.ws, diff);
                 this.prevState = textarea.innerHTML;
 
             }

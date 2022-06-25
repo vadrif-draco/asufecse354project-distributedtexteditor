@@ -20,20 +20,9 @@ const mongoose = require("mongoose")
 const Document = require("./Document")
 const middleware = express();
 
-const WebSocket = require('ws').Server;
-// Hard-coded for now as 3001 for testing purposes...
-const websocket = new WebSocket({ server: middleware.listen(3001) });
-let dataDiffSockets = [];
-
 const parser = require('body-parser');
 middleware.use(parser.json());
 // middleware.use(parser.urlencoded(extended: false));
-
-websocket.on('connection', socket => {
-
-    dataDiffSockets.push(socket);
-
-});
 
 // connecting to database
 mongoose.connect("mongodb://localhost/database",
@@ -85,9 +74,6 @@ middleware.post('/api/docs/document', async (request, response, nextuse) => {
     response.status(201).json({
         resp: 'HELO'
     })
-    for (dataDiffSock of dataDiffSockets) {
-        dataDiffSock.send(JSON.stringify(request.body))
-    }
 })
 
 middleware.post('/api/docs/my', (request, response, nextuse) => {

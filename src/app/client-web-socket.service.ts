@@ -1,17 +1,21 @@
+
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Subject, Observable, Subscriber, TeardownLogic } from 'rxjs';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
-export class DocumentEditorService {
+export class ClientWebSocketService {
 
-    constructor(private httpClient: HttpClient) { }
+    // Alternative implementation
+    // private incomingData!: Subject<any>;
+    
+    constructor() {}
 
-    private incomingDataDiff = new Subject();
-
-    initIncomingDataDiffListenerWebSocket(PORT: string): Observable<WebSocket> {
+    // This function initializes a web socket at the defined PORT
+    // FIXME: Also uses localhost, which should be changed in production
+    // Returns an observable of type websocket such that upon connection it has the methods defined below
+    initializeWebSocket(PORT: string): Observable<WebSocket> {
 
         return new Observable<WebSocket>(
             (subscriber: Subscriber<WebSocket>): TeardownLogic => {
@@ -35,6 +39,7 @@ export class DocumentEditorService {
             }
         );
 
+        // Alternative implementation
         // this.wsSubject = webSocket("ws://localhost:" + PORT);
         // const dataDiff = this.wsSubject.pipe(
 
@@ -42,14 +47,18 @@ export class DocumentEditorService {
         //     catchError(_ => EMPTY)
 
         // );
-        // this.incomingDataDiff.next(dataDiff);
-        // this.incomingDataDiff.complete();
+        // this.incomingData.next(dataDiff);
+        // this.incomingData.complete();
 
     }
 
-    // incomingDataDiffListener() { return this.incomingDataDiff.asObservable(); }
+    // Alternative implementation
+    // incomingDataListener() { return this.incomingData.asObservable(); }
 
-    createIncomingDataDiffListener(ws: WebSocket): Observable<any> {
+    // This function creates an observable of any type (for listening to generic data)
+    // Whenever the server-side sends a message (ws.onmessage) on the provided websocket it is asynchronously updated
+    // Whatever app component subscribed to this observable will act accordingly (based on its subscription method)
+    getWebSocketListener(ws: WebSocket): Observable<any> {
 
         return new Observable<any>(
             (subscriber: Subscriber<MessageEvent>): TeardownLogic => {
@@ -73,10 +82,17 @@ export class DocumentEditorService {
         );
     }
 
-    outgoingUpdate(dataDiff: any) {
+    // This function is required to send the provided generic data
+    // 
+    sendWebSocketData(ws: WebSocket, data: any) {
 
-        this.httpClient.post<{ resp: string }>('http://localhost:3000/api/docs/document', { data: dataDiff })
-            .subscribe((response) => { console.log("Server sent: " + response.resp) });
+        ws.send(JSON.stringify(data))
+
+        // TODO: Replace HTTP with websocket
+
+        // this.httpClient.post<{ resp: string }>('http://localhost:3000/api/docs/document', { data: dataDiff })
+        //     .subscribe((response) => { console.log("Server sent: " + response.resp) });
 
     }
+
 }
