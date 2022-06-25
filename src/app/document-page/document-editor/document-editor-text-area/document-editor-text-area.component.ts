@@ -12,20 +12,8 @@ export class DocumentEditorTextAreaComponent implements OnInit, OnDestroy, After
 
     constructor(private _docEditService: DocumentEditorService) { }
 
-    baseHTML: string = `
-        <style>
-        div #text, div div { padding-bottom: 16px; }
-            div br { padding-bottom: 0px; }
-            .inuse { background-color: #f6f6ff; border-bottom: 1px solid #d8d8ff; } // should be randomunique per user
-        </style>
-    `.trim();
-
-    stupidHTML: string = `
-        <div><span><br></span></div>
-    `.trim();
-
     lastChange: number = 0;
-    prevState: string = this.baseHTML + this.stupidHTML;
+    prevState: string = ``;
 
     private incomingDiffSubscription!: Subscription;
 
@@ -63,7 +51,6 @@ export class DocumentEditorTextAreaComponent implements OnInit, OnDestroy, After
     ngAfterViewInit(): void {
 
         let textarea = document.getElementById("textarea");
-        textarea!.innerHTML = this.baseHTML + this.stupidHTML;
         textarea!.focus();
         let that = this;
         setInterval(function () { that.checkForChanges(textarea!) }, 1000);
