@@ -1,8 +1,4 @@
 const Preview = require('./document-preview.model')
-const express = require('express');
-const parser = require('body-parser');
-
-const middleware = express();
 
 // To be fetched from mongodb later...
 
@@ -17,9 +13,25 @@ sharedDocs = [
     new Preview("Hocus Pocus Focus Locus Everybody is Among Us", 'https://www.falsof.com/images/Document_Mutual_Release.gif', '/edit'),
 ]
 
-middleware.use(parser.json());
+// --------------------------------------------------------------------------------------------------------------------------------------
 
+const express = require('express');
+const middleware = express();
+
+const WebSocket = require('ws').Server;
+// Hard-coded for now as 3001 for testing purposes...
+const websocket = new WebSocket({ server: middleware.listen(3001) });
+let dataDiffSockets = [];
+
+const parser = require('body-parser');
+middleware.use(parser.json());
 // middleware.use(parser.urlencoded(extended: false));
+
+websocket.on('connection', socket => {
+
+    dataDiffSockets.push(socket);
+
+});
 
 middleware.use((request, response, nextuse) => {
     response.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
@@ -29,10 +41,14 @@ middleware.use((request, response, nextuse) => {
 })
 
 middleware.post('/api/docs/document', (request, response, nextuse) => {
+    console.log("Server received from client:") // Mongooooo
     console.log(request.body) // Mongooooo
     response.status(201).json({
         resp: 'HELO'
     })
+    for (dataDiffSock of dataDiffSockets) {
+        dataDiffSock.send(JSON.stringify(request.body))
+    }
 })
 
 middleware.post('/api/docs/my', (request, response, nextuse) => {
