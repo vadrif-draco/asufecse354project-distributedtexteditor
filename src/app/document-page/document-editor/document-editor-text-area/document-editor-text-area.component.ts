@@ -14,6 +14,7 @@ export class DocumentEditorTextAreaComponent implements OnInit, OnDestroy, After
 
     lastChange: number = 0;
     prevState: string = ``;
+    POLLING_INTERVAL: number = 1;
 
     private incomingDiffSubscription!: Subscription;
 
@@ -53,7 +54,7 @@ export class DocumentEditorTextAreaComponent implements OnInit, OnDestroy, After
         let textarea = document.getElementById("textarea");
         textarea!.focus();
         let that = this;
-        setInterval(function () { that.checkForChanges(textarea!) }, 1000);
+        setInterval(function () { that.checkForChanges(textarea!) }, this.POLLING_INTERVAL);
 
     }
 
@@ -65,8 +66,8 @@ export class DocumentEditorTextAreaComponent implements OnInit, OnDestroy, After
 
         // anti-spam strategy...
 
-        // if change is too fast (within 100ms), skip it
-        if (Math.abs(this.lastChange - performance.now()) < 100) { // skip skip
+        // if change is too fast (within the polling interval), skip it
+        if (Math.abs(this.lastChange - performance.now()) < this.POLLING_INTERVAL) { // skip skip
 
             console.log(this.lastChange)
 
