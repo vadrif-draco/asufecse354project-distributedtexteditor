@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { DashboardService } from '../dashboard.service';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
+
 import { Preview } from '../document-preview/document-preview.model';
+import { DashboardService } from '../dashboard.service';
 
 @Component({
     selector: 'app-dashboard-main',
@@ -10,7 +11,7 @@ import { Preview } from '../document-preview/document-preview.model';
 })
 export class DashboardMainComponent implements OnInit, OnDestroy {
 
-    constructor(private dashService: DashboardService) { }
+    constructor(private _dashService: DashboardService) { }
 
     public myDocs: Preview[] = [];
     public sharedDocs: Preview[] = [];
@@ -32,20 +33,22 @@ export class DashboardMainComponent implements OnInit, OnDestroy {
         //     new Preview("Hocus Pocus Focus Locus Everybody is Among Us",  'https://www.falsof.com/images/Document_Mutual_Release.gif', '/edit'),
         // ]
 
-        this.myDocsSubscription = this.dashService.myDocsListener()
+        this.myDocsSubscription = this._dashService.myDocsListener()
             .subscribe((docs: Preview[]) => { this.myDocs = docs; });
 
-        this.sharedDocsSubscription = this.dashService.sharedDocsListener()
+        this.sharedDocsSubscription = this._dashService.sharedDocsListener()
             .subscribe((docs: Preview[]) => { this.sharedDocs = docs; });
 
-        this.dashService.myDocsRefresh();
-        this.dashService.sharedDocsRefresh();
+        this._dashService.myDocsRefresh();
+        this._dashService.sharedDocsRefresh();
 
     }
 
     ngOnDestroy(): void {
+
         this.myDocsSubscription.unsubscribe();
         this.sharedDocsSubscription.unsubscribe();
+
     }
 
 }

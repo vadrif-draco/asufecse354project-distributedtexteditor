@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit } from "@angular/core";
+import { Component, OnInit, OnDestroy, AfterViewInit, Input } from "@angular/core";
 import { Subscription } from 'rxjs';
 
 import { ClientWebSocketService } from '../../../client-web-socket.service';
@@ -13,6 +13,7 @@ export class DocumentEditorTextAreaComponent implements OnInit, OnDestroy, After
 
     constructor(private _clientSock: ClientWebSocketService) { }
 
+    @Input() uuid: string = ''
     ws!: WebSocket
 
     incomingDataChange: boolean = false;
@@ -40,9 +41,9 @@ export class DocumentEditorTextAreaComponent implements OnInit, OnDestroy, After
                     .subscribe((dataDiff: MessageEvent) => {
 
                         let textarea = document.getElementById("textarea")!;
-                        
+
                         this.incomingDataChange = true
-                        
+
                         // TODO: Actual parsing into textarea... Just logging it for now
                         // console.log(dataDiff.data)
                         // console.log(JSON.parse(dataDiff))
@@ -96,7 +97,7 @@ export class DocumentEditorTextAreaComponent implements OnInit, OnDestroy, After
             if (this.prevState.localeCompare(textarea.innerHTML) != 0) {
 
                 var diff = fastDiff(this.prevState, textarea.innerHTML)
-                if (this.ws) this._clientSock.sendWebSocketData(this.ws, diff);
+                if (this.ws) this._clientSock.sendWebSocketData(this.ws, { id: this.uuid, diff: diff });
                 this.prevState = textarea.innerHTML;
 
             }

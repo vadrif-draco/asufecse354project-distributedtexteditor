@@ -3,14 +3,14 @@ const Preview = require('./document-preview.model')
 // To be fetched from mongodb later...
 
 myDocs = [
-    new Preview("The Methodology of Mutuality", 'https://data.unhcr.org/images/documents/big_4cda85d892a5c0b5dd63b510a9c83e9c9d06e739.jpg', '/edit'),
-    new Preview("The blobology of blobs", 'https://www.kindpng.com/picc/m/332-3322562_document-hd-png-download.png', '/edit'),
-    new Preview("The bruh de la bruh", 'https://whc.unesco.org/uploads/thumbs/whc-99-conf204-inf1rev2e-500--20040502174412.jpg', '/edit'),
+    new Preview("The Methodology of Mutuality", 'https://data.unhcr.org/images/documents/big_4cda85d892a5c0b5dd63b510a9c83e9c9d06e739.jpg', '65cd0a3f-b2f3-4f31-bef5-a082f4e07644'),
+    new Preview("The blobology of blobs", 'https://www.kindpng.com/picc/m/332-3322562_document-hd-png-download.png', 'acf15013-ccb6-47fc-a416-3358844c75ea'),
+    new Preview("The bruh de la bruh", 'https://whc.unesco.org/uploads/thumbs/whc-99-conf204-inf1rev2e-500--20040502174412.jpg', '8a7a1af7-aa56-4a63-b25b-29fd1a2e4670'),
 ]
 
 sharedDocs = [
-    new Preview("Communism", 'https://data.unhcr.org/images/documents/big_fc9ae0efd72a628326e6aef6eeceb17759f2eca5.jpg', '/edit'),
-    new Preview("Hocus Pocus Focus Locus Everybody is Among Us", 'https://www.falsof.com/images/Document_Mutual_Release.gif', '/edit'),
+    new Preview("Communism", 'https://data.unhcr.org/images/documents/big_fc9ae0efd72a628326e6aef6eeceb17759f2eca5.jpg', '38f7f664-696d-42b8-b1b3-82e52dd008b8'),
+    new Preview("Hocus Pocus Focus Locus Everybody is Among Us", 'https://www.falsof.com/images/Document_Mutual_Release.gif', '59f2d55a-dd82-4453-829d-13fdd633d6ab'),
 ]
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -27,7 +27,7 @@ middleware.use(parser.json());
 // connecting to database
 mongoose.connect("mongodb://localhost/database",
     err => {
-        if(err) throw err;
+        if (err) throw err;
         console.log('connected to MongoDB')
     });
 
@@ -35,11 +35,11 @@ let documentStr = "";
 
 async function findOrCreateDocument(id) {
     if (id == null) return
-  
+
     const document = await Document.findById(id)
     if (document) return document
     return await Document.create({ _id: id, data: null })
-  }
+}
 
 function applyChanges(input, changes) {
     changes.forEach(change => {
@@ -69,7 +69,7 @@ middleware.post('/api/docs/document', async (request, response, nextuse) => {
     documentStr = docArray.join('');
     console.log(documentStr);
 
-    await Document.findByIdAndUpdate(docId, {data: documentStr})
+    await Document.findByIdAndUpdate(docId, { data: documentStr })
 
     response.status(201).json({
         resp: 'HELO'
@@ -96,6 +96,16 @@ middleware.get('/api/docs/shared', (request, response, nextuse) => {
         resp: 'Fetched documents shared with user XYZ',
         docs: sharedDocs
     })
+})
+
+middleware.get('/api/docs/:docuuid', async (request, response, nextuse) => {
+
+    var uuid = request.params.docuuid;
+
+    const document = await findOrCreateDocument(uuid);
+
+    // TODO: Logic @Ahmed1Bakry
+
 })
 
 module.exports = middleware;

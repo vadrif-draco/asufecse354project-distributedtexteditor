@@ -1,5 +1,5 @@
 <mat-card color="primary">
-    <button mat-mini-fab color="accent" [routerLink]="doc.url">
+    <button mat-mini-fab color="accent" [routerLink]="['/edit/', doc.uuid]">
         <mat-icon [matTooltip]="'Open '+doc.name">file_open</mat-icon>
     </button>
     <mat-card-title>{{ doc.name }}</mat-card-title>

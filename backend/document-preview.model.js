@@ -4,13 +4,13 @@ class Preview {
 
     name;
     img;
-    url;
+    uuid;
 
-    constructor(name, img, url) {
+    constructor(name, img, uuid) {
 
         this.name = name;
         this.img = img;
-        this.url = url;
+        this.uuid = uuid;
         
     }
 }
