@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  db:
+    image: "mongo"
+  backendserver:
+    build:
+      context: ./
+      dockerfile: ./deployment_scripts/backend/Dockerfile
+    ports:
+      - "3000:3000"
+    expose:
+      - "3000"
+    depends_on:
+      - db
+  frontendserver:
+    build:
+      context: ./
+      dockerfile: ./deployment_scripts/frontend/Dockerfile
+    ports:
+      - "80:80"
+    expose:
+      - "80"
+    restart: unless-stopped
+    depends_on:
+      - backendserver

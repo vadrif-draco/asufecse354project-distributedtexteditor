@@ -1,12 +1,5 @@
-# Dockerfile to use both Node and nginx images
+# Dockerfile to use an nginx image
 # Used for frontend serving
-
-# Name the node stage "builder"
-FROM node:alpine AS builder
-# Set working directory
-WORKDIR /frontend
-# Copy all files from build directory to container workdir
-COPY ./dist/asufecse354project-distributedtexteditor ./
 
 # nginx image
 FROM nginx:alpine
@@ -20,9 +13,8 @@ WORKDIR /usr/share/nginx/html
 # Remove default nginx assets
 RUN rm -rf ./*
 # Copy Angular build from builder stage
-COPY --from=builder /frontend .
+COPY ./dist/asufecse354project-distributedtexteditor ./
 
-# Expose port 80 used by nginx. The script does it just in case too.
 EXPOSE 80
 
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
