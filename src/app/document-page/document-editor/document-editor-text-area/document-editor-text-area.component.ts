@@ -20,7 +20,7 @@ export class DocumentEditorTextAreaComponent implements OnInit, AfterViewInit {
 
     lastChange: number = 0;
     prevState: string = ``;
-    POLLING_INTERVAL: number = 1;
+    POLLING_INTERVAL: number = 100;
 
     ngOnInit(): void { }
 
