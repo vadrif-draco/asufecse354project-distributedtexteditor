@@ -4,7 +4,7 @@ import { Preview } from './document-preview/document-preview.model';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 
-const host = process.env['HOSTNAME'] || 'localhost'
+const host = 'ec2-3-92-147-12.compute-1.amazonaws.com';
 
 @Injectable({
     providedIn: 'root'
