@@ -1,0 +1,29 @@
+events {
+    worker_connections 128;
+}
+
+http {
+    include mime.types;
+    resolver 172.16.0.23;
+
+    upstream backend {
+            server ${API_HOST}:3000;
+    }
+
+    server {
+        listen 80;
+        server_name $host;
+
+        location / {
+	    rewrite ^/?(.*) /$1 break;
+	    root /usr/share/nginx/html;
+            try_files $uri /index.html;
+        }
+
+        location /api {
+            proxy_pass http://backend;
+            rewrite ^/api/?(.*) /$1 break;
+            proxy_set_header Host $http_host;
+        }
+    }
+}

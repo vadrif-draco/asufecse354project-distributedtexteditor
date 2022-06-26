@@ -1,0 +1,8 @@
+# Ignore everything
+*
+
+# Except backend folder
+!/backend
+
+# Except node_modules (if exists)
+/backend/node_modules
