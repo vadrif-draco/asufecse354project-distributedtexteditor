@@ -8,6 +8,11 @@ http {
 
     upstream backend {
             server ${API_HOST}:3000;
+            server ${API_HOST}:3001;
+            server ${API_HOST}:3002;
+            server ${API_HOST}:3003;
+            server ${API_HOST}:3004;
+            server ${API_HOST}:3005;
     }
 
     server {
