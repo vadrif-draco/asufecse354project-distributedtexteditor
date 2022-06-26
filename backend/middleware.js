@@ -1,6 +1,7 @@
 const Preview = require('./document-preview.model')
 
 // To be fetched from mongodb later...
+// To be fetched from mongodb later...
 
 myDocs = [
     new Preview("The Methodology of Mutuality", 'https://data.unhcr.org/images/documents/big_4cda85d892a5c0b5dd63b510a9c83e9c9d06e739.jpg', '65cd0a3f-b2f3-4f31-bef5-a082f4e07644'),
@@ -26,7 +27,7 @@ middleware.use(parser.json());
 // middleware.use(parser.urlencoded(extended: false));
 
 // connecting to database
-mongoose.connect("mongodb://localhost/database",
+mongoose.connect("mongodb://db/database",
     err => {
         if (err) throw err;
         console.log('connected to MongoDB')
@@ -63,6 +64,7 @@ middleware.post('/api/docs/document', async (request, response, nextuse) => {
 })
 
 middleware.post('/api/docs/my', (request, response, nextuse) => {
+    console.log(request.body) // Later should extract its content and store into mongodb
     console.log(request.body) // Later should extract its content and store into mongodb
     response.status(201).json({
         resp: 'MESSAGE FROM SERVER: Cool document bro'

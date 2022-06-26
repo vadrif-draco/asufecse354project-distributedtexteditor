@@ -2,7 +2,7 @@
     "name": "asufecse354project-distributedtexteditor",
     "version": "0.0.0",
     "scripts": {
-        "start:server": "nodemon ./server.js"
+        "start:server": "nodemon ./middleware.js"
     },
     "private": true,
     "dependencies": {
