@@ -29,15 +29,15 @@ export class DocumentEditorTextAreaComponent implements OnInit, OnDestroy, After
         // First we asynchronously initialize the websocket on which we will be listening (hard-coded to 3001 for now)
 
         
+
         this._clientSock.initializeWebSocket("3000")
 
             // And when the websocket is ready...
             .subscribe((ws: WebSocket) => {
 
                 this.ws = ws
-
+                
                 this._clientSock.sendWebSocketData(this.ws, { type:'load', id: this.uuid });
-
                 // Asynchronously setup the subscription which will update our document
                 this.incomingDiffSubscription = this._clientSock.getWebSocketListener(ws)
 
@@ -63,6 +63,8 @@ export class DocumentEditorTextAreaComponent implements OnInit, OnDestroy, After
                         else if(res.type == 'load')
                         {
                             //console.log(res);
+                            this.incomingDataChange = true;
+
                             textarea.innerHTML = res.doc;
                         }
 
@@ -85,6 +87,7 @@ export class DocumentEditorTextAreaComponent implements OnInit, OnDestroy, After
         let textarea = document.getElementById("textarea");
         textarea!.focus();
         let that = this;
+        
         setInterval(function () { that.checkForChanges(textarea!) }, this.POLLING_INTERVAL);
 
     }

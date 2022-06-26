@@ -32,15 +32,6 @@ mongoose.connect("mongodb://localhost/database",
         console.log('connected to MongoDB')
     });
 
-let documentStr = "";
-
-async function findOrCreateDocument(id) {
-    if (id == null) return
-
-    const document = await Document.findById(id)
-    if (document) return document
-    return await Document.create({ _id: id, data: null })
-}
 
 
 middleware.use((request, response, nextuse) => {
@@ -101,16 +92,6 @@ middleware.get('/api/docs/:docuuid', async (request, response, nextuse) => {
 
 
 let openDocs = {}
-function getLocalDoc(id)
-{
-    if(openDocs[id])
-    {
-        return openDocs[id];
-    }
-
-    openDocs[id] = '';
-    return openDocs[id];
-}
 
 function applyChanges(input, changes) {
     changes.forEach(change => {
@@ -161,39 +142,92 @@ const onListening = () => {
 
 };
 
+// saving task
+var saving_interval = 5 * 1000;
+setInterval(async function() {
+    
+    console.log('Saving Modified fDocuments');
+
+    for(var id in openDocs)
+    {
+        if(openDocs[id].saved == false)
+        {
+            var doc = await findOrCreateDocument(id);
+
+            doc.vers.push({date: new Date(), body: openDocs[id].body})
+
+            openDocs[id].saved = true;
+
+            await Document.findByIdAndUpdate(id, { vers: doc.vers })
+        }
+
+    }
+  }, saving_interval);
+
+async function findOrCreateDocument(id) {
+    if (id == null) return
+
+    const document = await Document.findById(id)
+    if (document) return document
+    return await Document.create({ _id: id, title: 'Untitled', vers: [{date: new Date(), body: ''}] })
+}
+
+
 // This function is to be triggered when a client connects to the Web socket server
 const onConnection = (ws) => {
 
     // TODO: What to do upon connection?
-    ws.on("message", (msg) => {
+    ws.on("message", async (msg) => {
 
         // TODO: What to do with the msg received from the client connected on this socket?
 
         var res = JSON.parse(msg);
         //console.log(res)
 
+        var id = res.id;
 
         if(res.type == 'load')
         {
-            res.doc = getLocalDoc(res.id);
+            // check if available in cache
+
+            if(openDocs[id])
+            {
+                res.doc = openDocs[id].body;
+            }
+
+            // check in database
+            else
+            {
+                var doc = await findOrCreateDocument(id);
+
+                openDocs[id] = {saved: true, body: doc.vers[doc.vers.length-1].body};
+
+                res.doc = openDocs[id].body;
+            }
+            
             ws.send(JSON.stringify(res))
         }
-        else
+        else if(res.type == 'change')
         {
 
-            var content = getLocalDoc(res.id);
+            var content = openDocs[id].body;
 
+            // Make it unsaved
+            openDocs[id].saved = false;
+
+            // Modify local version
             var docArray = Array.from(content);
             applyChanges(docArray, res.diff);
             content = docArray.join('');
-            openDocs[res.id] = content;
+            openDocs[res.id].body = content;
         
+            // Notify other clients
             for (clientws of wsserver.clients) {
 
-                // console.log(JSON.parse(msg))
                 if (clientws != ws) { clientws.send(JSON.stringify(res)) }
     
             }
+
         }
 
 
