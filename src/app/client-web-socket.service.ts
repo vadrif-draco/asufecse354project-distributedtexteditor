@@ -1,6 +1,7 @@
 
 import { Injectable } from '@angular/core';
-import { Subject, Observable, Subscriber, TeardownLogic } from 'rxjs';
+import { Observable, Subscriber, TeardownLogic } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +21,7 @@ export class ClientWebSocketService {
         return new Observable<WebSocket>(
             (subscriber: Subscriber<WebSocket>): TeardownLogic => {
 
-                const ws = new WebSocket("ws://localhost:" + PORT);
+                const ws = new WebSocket(`ws://${environment.hostname}:` + PORT);
                 
                 ws.onopen = () => {
                     subscriber.next(ws);

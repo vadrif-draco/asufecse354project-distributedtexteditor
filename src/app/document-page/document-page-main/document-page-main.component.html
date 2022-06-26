@@ -1,4 +1,18 @@
-<body>
+<body *ngIf="loaded; else loading_bar">
     <!-- The status bar should be here with share button and active users and what not -->
-    <app-document-editor-main [uuid]="uuid"></app-document-editor-main>
+    <app-document-editor-main
+        [uuid]="uuid"
+        [loaded]="loaded"
+        [incomingDocInit]="incomingDocInit"
+        [incomingDataFlag]="incomingDataFlag"
+        [incomingDataDiff]="incomingDataDiff"
+        (outgoingDataDiffRequest)="sendLocalDiff($event)"
+        (confirmDiffReceipt)="confirmDiffReceipt()">
+    </app-document-editor-main>
 </body>
+
+<ng-template #loading_bar>
+    <body>
+        <mat-progress-bar color="primary" mode="indeterminate"></mat-progress-bar>
+    </body>
+</ng-template>

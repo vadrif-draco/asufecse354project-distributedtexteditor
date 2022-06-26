@@ -35,7 +35,7 @@ mongoose.connect("mongodb://localhost/database",
 
 
 middleware.use((request, response, nextuse) => {
-    response.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
+    response.setHeader("Access-Control-Allow-Origin", "*");
     response.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS");
     response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type");
     nextuse(); // To go to the following use() calls
@@ -155,6 +155,8 @@ setInterval(async function() {
             var doc = await findOrCreateDocument(id);
 
             doc.vers.push({date: new Date(), body: openDocs[id].body})
+
+            console.log(id)
 
             openDocs[id].saved = true;
 

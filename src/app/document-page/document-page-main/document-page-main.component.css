@@ -3,3 +3,9 @@ body {
     height: 100vh;
     overflow: auto;
 }
+
+mat-progress-bar {
+    top: 50%;
+    width: 50%;
+    margin: auto;
+}

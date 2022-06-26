@@ -1,5 +1,13 @@
  <app-document-editor-toolbar></app-document-editor-toolbar>
 
 <div>
-    <app-document-editor-text-area [uuid]="uuid"></app-document-editor-text-area>
+    <app-document-editor-text-area
+        [uuid]="uuid"
+        [loaded]="loaded"
+        [incomingDocInit]="incomingDocInit"
+        [incomingDataFlag]="incomingDataFlag"
+        [incomingDataDiff]="incomingDataDiff"
+        (outgoingDataDiffRequest)="delegateRequest($event)"
+        (confirmDiffReceipt)="delegateReceipt()">
+    </app-document-editor-text-area>
 </div>
