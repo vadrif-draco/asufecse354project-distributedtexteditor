@@ -28,6 +28,7 @@ middleware.use(parser.json());
 
 // connecting to database
 mongoose.connect("mongodb://db/database",
+// mongoose.connect("mongodb://localhost/database",
     err => {
         if (err) throw err;
         console.log('connected to MongoDB')

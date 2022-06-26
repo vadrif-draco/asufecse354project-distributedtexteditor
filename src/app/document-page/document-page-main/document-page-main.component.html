@@ -6,8 +6,10 @@
         [incomingDocInit]="incomingDocInit"
         [incomingDataFlag]="incomingDataFlag"
         [incomingDataDiff]="incomingDataDiff"
+        [incomingDocVersions]="incomingDocVersions"
         (outgoingDataDiffRequest)="sendLocalDiff($event)"
-        (confirmDiffReceipt)="confirmDiffReceipt()">
+        (confirmDiffReceipt)="confirmDiffReceipt()"
+        (requestHistories)="requestDocumentHistory()"> 
     </app-document-editor-main>
 </body>
 

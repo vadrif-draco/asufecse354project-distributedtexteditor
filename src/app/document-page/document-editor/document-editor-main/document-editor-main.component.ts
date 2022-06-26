@@ -12,22 +12,33 @@ export class DocumentEditorMainComponent implements OnInit {
     @Input() incomingDocInit: string | null = null
     @Input() incomingDataDiff: any
     @Input() incomingDataFlag: boolean = false;
+    
+    @Input() incomingDocVersions!: any[]
+
     @Output() outgoingDataDiffRequest = new EventEmitter<any>();
     @Output() confirmDiffReceipt = new EventEmitter<any>();
+    
+    @Output() requestHistories = new EventEmitter<any>();
 
     constructor() { }
 
     ngOnInit(): void { }
 
-    delegateRequest(request: any) {
+    delegateDataDiffRequest(request: any) {
 
         this.outgoingDataDiffRequest.emit(request)
 
     }
 
-    delegateReceipt() {
+    delegateDataDiffReceipt() {
         
         this.confirmDiffReceipt.emit()
+
+    }
+
+    delegateHistoryRequest() {
+
+        this.requestHistories.emit()
 
     }
 

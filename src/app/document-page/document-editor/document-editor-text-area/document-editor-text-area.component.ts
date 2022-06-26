@@ -28,13 +28,18 @@ export class DocumentEditorTextAreaComponent implements OnInit, AfterViewInit {
 
         while (!this.loaded) { }
         let textarea = document.getElementById("textarea")!
-        if (this.incomingDocInit) textarea.innerHTML = this.incomingDocInit
-        this.prevState = textarea.innerHTML
+        if (this.incomingDocInit) this.load(this.incomingDocInit)
         textarea!.focus()
         let that = this
 
         setInterval(function () { that.checkForChanges(textarea!) }, this.POLLING_INTERVAL);
 
+    }
+
+    load(doc: string) {
+        let textarea = document.getElementById("textarea")!
+        textarea.innerHTML = doc
+        this.prevState = textarea.innerHTML
     }
 
     // This function triggers whenever an input event occurs to the text area

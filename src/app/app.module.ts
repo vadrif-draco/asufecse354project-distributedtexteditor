@@ -15,6 +15,7 @@ import { DocumentPageMainComponent } from './document-page/document-page-main/do
 import { DocumentEditorMainComponent } from './document-page/document-editor/document-editor-main/document-editor-main.component';
 import { DocumentEditorToolbarComponent } from './document-page/document-editor/document-editor-toolbar/document-editor-toolbar.component';
 import { DocumentEditorTextAreaComponent } from './document-page/document-editor/document-editor-text-area/document-editor-text-area.component';
+import { DocumentHistoryPaneComponent } from './document-page/document-editor/document-history-pane/document-history-pane.component';
 
 // Angular Material Components
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -29,8 +30,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-
-
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 @NgModule({
     declarations: [
@@ -42,7 +42,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
         DocumentPageMainComponent,
         DocumentEditorMainComponent,
         DocumentEditorToolbarComponent,
-        DocumentEditorTextAreaComponent
+        DocumentEditorTextAreaComponent,
+        DocumentHistoryPaneComponent
     ],
     imports: [
         BrowserModule,
@@ -61,7 +62,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
         MatIconModule,
         MatTooltipModule,
         MatFormFieldModule,
-        MatProgressBarModule
+        MatProgressBarModule,
+        MatPaginatorModule
     ],
     providers: [],
     bootstrap: [AppComponent]

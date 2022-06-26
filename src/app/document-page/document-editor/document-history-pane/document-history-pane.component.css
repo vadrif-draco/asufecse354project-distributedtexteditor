@@ -1,0 +1,33 @@
+mat-card button {
+    display: block-inline;
+}
+
+div button {
+    z-index: 200;
+    position: fixed;
+    transform: translateX(calc(100vw - 5vw)) translateY(calc(100vh - 15vh));
+}
+
+body {
+    z-index: 100;
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+body * {
+    z-index: 101;
+}
+
+mat-card {
+    position: fixed;
+    top: 20vh;
+    height: 60vh;
+    left: 10vw;
+    width: 80vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}

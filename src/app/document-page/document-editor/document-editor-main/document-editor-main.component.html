@@ -1,13 +1,19 @@
- <app-document-editor-toolbar></app-document-editor-toolbar>
+<app-document-history-pane
+    [histories]="incomingDocVersions"
+    (requestHistories)="delegateHistoryRequest()">
+</app-document-history-pane>
+
+<app-document-editor-toolbar></app-document-editor-toolbar>
 
 <div>
     <app-document-editor-text-area
+        #textarea
         [uuid]="uuid"
         [loaded]="loaded"
         [incomingDocInit]="incomingDocInit"
         [incomingDataFlag]="incomingDataFlag"
         [incomingDataDiff]="incomingDataDiff"
-        (outgoingDataDiffRequest)="delegateRequest($event)"
-        (confirmDiffReceipt)="delegateReceipt()">
+        (outgoingDataDiffRequest)="delegateDataDiffRequest($event)"
+        (confirmDiffReceipt)="delegateDataDiffReceipt()">
     </app-document-editor-text-area>
 </div>

@@ -1,0 +1,26 @@
+<body *ngIf="showHistoryPrompt">
+    <mat-card>
+        <mat-grid-list cols="1" rowHeight="fit" *ngFor="let h of historiesSlice">
+            <button mat-raised-button color="primary" (click)="loadDocument(h.body)">{{ h.date }}</button>
+        </mat-grid-list>
+        <mat-paginator #paginator
+            [hidePageSize]="true"
+            [pageSize]="pageSize"
+            [length]="total"
+            (page)="update($event)">
+        </mat-paginator>
+    </mat-card>
+</body>
+<!-- 
+<div *ngIf="pageEvent">
+    <h5>Page Change Event Properties</h5>
+    <div>List length: {{pageEvent.length}}</div>
+    <div>Page size: {{pageEvent.pageSize}}</div>
+    <div>Page index: {{pageEvent.pageIndex}}</div>
+</div> -->
+<div>
+    <button mat-mini-fab color="primary" (click)="toggleHistoryPrompt()">
+        <!-- (click)=""> -->
+        <mat-icon matTooltip="View revision history" [matTooltipPosition]="'left'">manage_history</mat-icon>
+    </button>
+</div>

@@ -11,15 +11,17 @@ import { ClientWebSocketService } from '../../client-web-socket.service';
 })
 export class DocumentPageMainComponent implements OnInit {
 
-    public loaded: boolean = false
+    ws!: WebSocket
+    private incomingWebSocketSubscription!: Subscription;
 
     uuid: string = ''
 
-    ws!: WebSocket
+    loaded: boolean = false
     incomingDocInit: string | null = null
     incomingDataDiff: any
     incomingDataFlag: boolean = false;
-    private incomingDiffSubscription!: Subscription;
+
+    incomingDocVersions!: any[]
 
     constructor(private _route: ActivatedRoute, private _clientSock: ClientWebSocketService) { }
 
@@ -46,7 +48,7 @@ export class DocumentPageMainComponent implements OnInit {
                 this._clientSock.sendWebSocketData(this.ws, { type: 'load', id: this.uuid });
 
                 // Asynchronously setup the subscription which will update our document
-                this.incomingDiffSubscription = this._clientSock.getWebSocketListener(ws)
+                this.incomingWebSocketSubscription = this._clientSock.getWebSocketListener(ws)
 
                     // Which is required to use the dataDiff received via the websocket to update the local textarea
                     .subscribe((msg: MessageEvent) => {
@@ -66,6 +68,11 @@ export class DocumentPageMainComponent implements OnInit {
                             this.incomingDocInit = res.doc; // textarea should directly update innerHTML with this
                             this.loaded = true; // indicate that document loading is finished
 
+                        } else if (res.type == 'getVersions') {
+
+                            this.incomingDocVersions = res.vers
+                            console.log(res.vers)
+
                         }
 
                     });
@@ -76,7 +83,7 @@ export class DocumentPageMainComponent implements OnInit {
 
     ngOnDestroy(): void {
 
-        this.incomingDiffSubscription.unsubscribe();
+        this.incomingWebSocketSubscription.unsubscribe();
 
     }
 
@@ -86,6 +93,15 @@ export class DocumentPageMainComponent implements OnInit {
             this._clientSock.sendWebSocketData(this.ws, { type: 'change', id: this.uuid, diff: diff });
             console.log("Sent:")
             console.log(diff)
+        }
+
+    }
+
+    requestDocumentHistory() {
+
+        if (this.ws) {
+            this._clientSock.sendWebSocketData(this.ws, { type: 'getVersions', id: this.uuid });
+            console.log(`Document revision history requested for ${this.uuid}`)
         }
 
     }
