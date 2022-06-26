@@ -27,6 +27,8 @@ export class DocumentEditorTextAreaComponent implements OnInit, OnDestroy, After
     ngOnInit(): void {
 
         // First we asynchronously initialize the websocket on which we will be listening (hard-coded to 3001 for now)
+
+        
         this._clientSock.initializeWebSocket("3000")
 
             // And when the websocket is ready...
@@ -34,20 +36,36 @@ export class DocumentEditorTextAreaComponent implements OnInit, OnDestroy, After
 
                 this.ws = ws
 
+                this._clientSock.sendWebSocketData(this.ws, { type:'load', id: this.uuid });
+
                 // Asynchronously setup the subscription which will update our document
                 this.incomingDiffSubscription = this._clientSock.getWebSocketListener(ws)
 
                     // Which is required to use the dataDiff received via the websocket to update the local textarea
-                    .subscribe((dataDiff: MessageEvent) => {
+                    .subscribe((msg: MessageEvent) => {
+
+                        var res = JSON.parse(msg.data)
 
                         let textarea = document.getElementById("textarea")!;
 
-                        this.incomingDataChange = true
+                        if(res.type == 'change')
+                        {
 
-                        // TODO: Actual parsing into textarea... Just logging it for now
-                        // console.log(dataDiff.data)
-                        // console.log(JSON.parse(dataDiff))
-                        textarea.innerHTML = updateDocument(textarea.innerHTML, JSON.parse(dataDiff.data))
+                            this.incomingDataChange = true
+    
+                            // TODO: Actual parsing into textarea... Just logging it for now
+                            // console.log(dataDiff.data)
+                            // console.log(JSON.parse(dataDiff))
+                            //console.log(res);
+                            textarea.innerHTML = updateDocument(textarea.innerHTML, res.diff)
+    
+                        }
+                        else if(res.type == 'load')
+                        {
+                            //console.log(res);
+                            textarea.innerHTML = res.doc;
+                        }
+
 
                     });
 
@@ -97,7 +115,7 @@ export class DocumentEditorTextAreaComponent implements OnInit, OnDestroy, After
             if (this.prevState.localeCompare(textarea.innerHTML) != 0) {
 
                 var diff = fastDiff(this.prevState, textarea.innerHTML)
-                if (this.ws) this._clientSock.sendWebSocketData(this.ws, { id: this.uuid, diff: diff });
+                if (this.ws) this._clientSock.sendWebSocketData(this.ws, { type:'change', id: this.uuid, diff: diff });
                 this.prevState = textarea.innerHTML;
 
             }

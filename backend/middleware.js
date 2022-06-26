@@ -14,12 +14,13 @@ sharedDocs = [
 ]
 
 // --------------------------------------------------------------------------------------------------------------------------------------
-
+const http = require("http");
 const express = require('express');
 const mongoose = require("mongoose")
 const Document = require("./Document")
 const middleware = express();
-
+const debugmodule = require("debug")("ng");
+const websocketmodule = require('ws');
 const parser = require('body-parser');
 middleware.use(parser.json());
 // middleware.use(parser.urlencoded(extended: false));
@@ -41,15 +42,6 @@ async function findOrCreateDocument(id) {
     return await Document.create({ _id: id, data: null })
 }
 
-function applyChanges(input, changes) {
-    changes.forEach(change => {
-        if (change.type == 'insert') {
-            input.splice(change.index, 0, ...change.values);
-        } else if (change.type == 'delete') {
-            input.splice(change.index, change.howMany);
-        }
-    });
-}
 
 middleware.use((request, response, nextuse) => {
     response.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
@@ -103,9 +95,120 @@ middleware.get('/api/docs/:docuuid', async (request, response, nextuse) => {
     var uuid = request.params.docuuid;
 
     const document = await findOrCreateDocument(uuid);
-
     // TODO: Logic @Ahmed1Bakry
 
 })
 
-module.exports = middleware;
+
+let openDocs = {}
+function getLocalDoc(id)
+{
+    if(openDocs[id])
+    {
+        return openDocs[id];
+    }
+
+    openDocs[id] = '';
+    return openDocs[id];
+}
+
+function applyChanges(input, changes) {
+    changes.forEach(change => {
+        if (change.type == 'insert') {
+            input.splice(change.index, 0, ...change.values);
+        } else if (change.type == 'delete') {
+            input.splice(change.index, change.howMany);
+        }
+    });
+}
+
+
+const validatePort = (portval) => {
+
+    var portnum = parseInt(portval);
+    if (isNaN(portnum)) return portval; // port is named (aka a pipe)
+    if (portnum >= 0) return portnum; // port is a valid number
+    return false;
+
+};
+
+
+const onError = (error) => {
+
+    if (error.syscall !== "listen") throw error;
+
+    switch (error.code) {
+
+        case "EACCES":
+            console.error(bind + " requires elevated privileges");
+            process.exit(1);
+
+        case "EADDRINUSE":
+            console.error(bind + " is already in use");
+            process.exit(1);
+
+        default:
+            throw error;
+
+    }
+
+};
+
+const onListening = () => {
+
+    // const addr = server.address();
+    debugmodule("Listening on " + bind);
+
+};
+
+// This function is to be triggered when a client connects to the Web socket server
+const onConnection = (ws) => {
+
+    // TODO: What to do upon connection?
+    ws.on("message", (msg) => {
+
+        // TODO: What to do with the msg received from the client connected on this socket?
+
+        var res = JSON.parse(msg);
+        //console.log(res)
+
+
+        if(res.type == 'load')
+        {
+            res.doc = getLocalDoc(res.id);
+            ws.send(JSON.stringify(res))
+        }
+        else
+        {
+
+            var content = getLocalDoc(res.id);
+
+            var docArray = Array.from(content);
+            applyChanges(docArray, res.diff);
+            content = docArray.join('');
+            openDocs[res.id] = content;
+        
+            for (clientws of wsserver.clients) {
+
+                // console.log(JSON.parse(msg))
+                if (clientws != ws) { clientws.send(JSON.stringify(res)) }
+    
+            }
+        }
+
+
+    })
+
+}
+
+const port = validatePort(process.env.PORT || "3000");
+const bind = (typeof port === "string") ? "pipe " + port : "port " + port;
+
+middleware.set("port", port);
+
+const server = http.createServer(middleware);
+const wsserver = new websocketmodule.Server({ server });
+wsserver.on("connection", onConnection);
+server.on("listening", onListening);
+server.on("error", onError);
+server.listen(port);
