@@ -44,7 +44,7 @@ export class DocumentPageMainComponent implements OnInit {
 
                 // Request document load using given uuid
                 this._clientSock.sendWebSocketData(this.ws, { type: 'load', id: this.uuid });
-
+                this._clientSock.sendWebSocketData(this.ws, { type: 'getVersions', id: this.uuid });
                 // Asynchronously setup the subscription which will update our document
                 this.incomingDiffSubscription = this._clientSock.getWebSocketListener(ws)
 

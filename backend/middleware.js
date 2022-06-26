@@ -254,6 +254,16 @@ const onConnection = (ws) => {
             }
 
         }
+        else if(res.type == 'getVersions')
+        {
+
+            var doc = await findOrCreateDocument(id);
+
+            res.vers = doc.vers;
+
+            ws.send(JSON.stringify(res))
+
+        }
 
 
     })
