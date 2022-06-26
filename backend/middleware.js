@@ -32,7 +32,10 @@ mongoose.connect("mongodb://localhost/database",
         console.log('connected to MongoDB')
     });
 
-
+//global variables
+let rooms = {} // id :[ws,ws,.....]
+let clients = {} // ws : room
+let openDocs = {}
 
 middleware.use((request, response, nextuse) => {
     response.setHeader("Access-Control-Allow-Origin", "*");
@@ -91,7 +94,7 @@ middleware.get('/api/docs/:docuuid', async (request, response, nextuse) => {
 })
 
 
-let openDocs = {}
+
 
 function applyChanges(input, changes) {
     changes.forEach(change => {
@@ -146,7 +149,7 @@ const onListening = () => {
 var saving_interval = 5 * 1000;
 setInterval(async function() {
     
-    console.log('Saving Modified fDocuments');
+    //console.log('Saving Modified fDocuments');
 
     for(var id in openDocs)
     {
@@ -178,6 +181,15 @@ async function findOrCreateDocument(id) {
 // This function is to be triggered when a client connects to the Web socket server
 const onConnection = (ws) => {
 
+    ws.on('close', function(){
+        for(var id in rooms)
+        {
+            var indx = rooms[id].indexOf(ws);
+            if (indx !== -1) {
+                rooms[id].splice(indx, 1);
+            }
+        }
+      });
     // TODO: What to do upon connection?
     ws.on("message", async (msg) => {
 
@@ -190,6 +202,17 @@ const onConnection = (ws) => {
 
         if(res.type == 'load')
         {
+
+            //Create room if no room exists
+            if(!rooms[id]) rooms[id] = [];
+            
+            // Add user to room
+            if(!rooms[id].includes(ws))
+            {
+                rooms[id].push(ws);
+            }
+            
+
             // check if available in cache
 
             if(openDocs[id])
@@ -224,7 +247,7 @@ const onConnection = (ws) => {
             openDocs[res.id].body = content;
         
             // Notify other clients
-            for (clientws of wsserver.clients) {
+            for (clientws of rooms[id]) {
 
                 if (clientws != ws) { clientws.send(JSON.stringify(res)) }
     
