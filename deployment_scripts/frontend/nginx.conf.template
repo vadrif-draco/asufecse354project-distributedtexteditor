@@ -7,7 +7,7 @@ http {
     resolver 172.16.0.23;
 
     upstream backend {
-            server ec2-3-92-147-12.compute-1.amazonaws.com:3000;
+            server ${API_HOST}:3000;
     }
 
     server {
