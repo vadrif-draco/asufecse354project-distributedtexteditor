@@ -28,6 +28,8 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+
 
 
 @NgModule({
@@ -58,7 +60,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
         MatButtonToggleModule,
         MatIconModule,
         MatTooltipModule,
-        MatFormFieldModule
+        MatFormFieldModule,
+        MatProgressBarModule
     ],
     providers: [],
     bootstrap: [AppComponent]

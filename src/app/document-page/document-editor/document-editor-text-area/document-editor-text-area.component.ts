@@ -1,5 +1,5 @@
-import { Component, EventEmitter, OnInit, AfterViewInit } from "@angular/core";
-import { DocumentEditorService } from "../document-editor.service";
+import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter } from "@angular/core";
+import { fastDiff, updateDocument } from "./document-editor-text-area.fast-diff";
 
 @Component({
     selector: "app-document-editor-text-area",
@@ -8,116 +8,70 @@ import { DocumentEditorService } from "../document-editor.service";
 })
 export class DocumentEditorTextAreaComponent implements OnInit, AfterViewInit {
 
-    constructor(private _docEditService: DocumentEditorService) { }
+    constructor() { }
+
+    @Input() uuid: string = ''
+    @Input() loaded: boolean = false
+    @Input() incomingDocInit: string | null = null
+    @Input() incomingDataDiff: any
+    @Input() incomingDataFlag: boolean = false;
+    @Output() confirmDiffReceipt = new EventEmitter<any>();
+    @Output() outgoingDataDiffRequest = new EventEmitter<any>();
+
+    lastChange: number = 0;
+    prevState: string = ``;
+    POLLING_INTERVAL: number = 100;
 
     ngOnInit(): void { }
 
-    baseHTML: string = `
-        <style>
-            div #text, div div { padding-bottom: 16px; }
-            div br { padding-bottom: 0px; }
-            .inuse { background-color: #f6f6ff; border-bottom: 1px solid #d8d8ff; } // should be randomunique per user
-        </style>
-    `.trim();
-
-    stupidHTML: string = `
-        <div><span><br></span></div>
-    `.trim();
-
     ngAfterViewInit(): void {
-        let textarea = document.getElementById("textarea")
-        textarea!.innerHTML = this.baseHTML + this.stupidHTML;
-        textarea!.focus();
+
+        while (!this.loaded) { }
+        let textarea = document.getElementById("textarea")!
+        if (this.incomingDocInit) textarea.innerHTML = this.incomingDocInit
+        this.prevState = textarea.innerHTML
+        textarea!.focus()
+        let that = this
+
+        setInterval(function () { that.checkForChanges(textarea!) }, this.POLLING_INTERVAL);
+
     }
 
+    // This function triggers whenever an input event occurs to the text area
+    // It is used to update the time
+    trackTime() { this.lastChange = performance.now() }
 
-    // private getParentDiv(sel: Selection): Node {
+    checkForChanges(textarea: HTMLElement): void {
 
-    //     let child: Node = sel.anchorNode!;
+        if (this.incomingDataFlag) {
 
-    //     while (true) {
-
-    //         let parent = child!.parentNode;
-    //         if (!parent) return child;
-    //         if (parent!.nodeName == "DIV") return parent;
-    //         child = parent;
-
-    //     }
-    // }
-
-    currNode?: HTMLElement | null = null;
-    lastChange: DOMHighResTimeStamp = 0;
-    updateEvent: EventEmitter<any> = new EventEmitter();
-
-    localChange(event: KeyboardEvent | MouseEvent, textarea: HTMLElement): void {
-
-        let newNode: HTMLElement = <HTMLElement>getSelection()!.anchorNode!;
-
-        if (this.currNode == null && newNode && newNode.id !== "textarea") {
-
-            console.log("Nodes have changed")
-
-            this.currNode = newNode;
-            if (this.currNode.nodeName == "#text") {
-
-                let currNodeParent: HTMLElement | null = this.currNode.parentElement;
-                if (currNodeParent && currNodeParent.id != "textarea") currNodeParent.className = "inuse";
-
-            } else this.currNode.className = "inuse";
-
-        } else if (this.currNode && newNode && !this.currNode.isSameNode(newNode)) {
-
-            console.log("Nodes have changed")
-
-            if (this.currNode.nodeName == "#text") {
-
-                let currNodeParent: HTMLElement | null = this.currNode.parentElement;
-                if (currNodeParent && currNodeParent.id != "textarea") currNodeParent.className = "";
-
-            } else this.currNode.className = "";
-
-            // Emit to server the last state of the node before switching out
-
-            this.currNode = newNode;
-            if (this.currNode.nodeName == "#text") {
-
-                let currNodeParent: HTMLElement = this.currNode.parentElement!;
-                if (currNodeParent.id != "textarea") currNodeParent.className = "inuse";
-            
-            } else this.currNode.className = "inuse";
-
-        } else if (this.currNode && newNode && this.currNode.isSameNode(newNode)) {
-
-            console.log("Nodes are same; no changes") // i.e., do nothing
-
-        } else {
-
-            if (this.currNode != null) this.currNode.className = "";
-            this.currNode = null;
+            console.log(this.incomingDataDiff)
+            textarea.innerHTML = updateDocument(textarea.innerHTML, this.incomingDataDiff)
+            this.prevState = textarea.innerHTML
+            // this.incomingDataFlag = false
+            this.confirmDiffReceipt.emit()
+            // return
 
         }
 
-        // forcing first child (after base style) to be a div, cause it isn"t by default
-        console.log(textarea.childNodes)
-        if (!textarea!.innerHTML.trim().includes(this.baseHTML)
-            || textarea!.childNodes[1]!.nodeName != "DIV"
-            || textarea!.childNodes[1]!.firstChild!.nodeName != "SPAN") {
-            textarea.innerHTML = this.baseHTML + this.stupidHTML;
+        // anti-spam strategy...
+
+        // if change is too fast (within the polling interval), skip it
+        if (Math.abs(this.lastChange - performance.now()) < this.POLLING_INTERVAL) { // skip skip
+
+            console.log(this.lastChange)
+
+        } else { // otherwise, if there is a difference, emit it
+
+            if (this.prevState.localeCompare(textarea.innerHTML) != 0) {
+
+                var diff = fastDiff(this.prevState, textarea.innerHTML)
+                this.outgoingDataDiffRequest.emit(diff)
+                this.prevState = textarea.innerHTML;
+
+            }
+
         }
-
-        // anti-spam, only fire events every 1000ms
-        if (Math.abs(this.lastChange - event.timeStamp) > 1000) {
-
-            this.lastChange = event.timeStamp;
-
-            // Emit latest state of currently selected node to server
-
-            // Should perhaps consider using deltas instead of the entire innerHTML every time
-
-        }
-
-        console.dir(this.currNode)
-        console.dir(newNode)
 
     }
 

@@ -4,13 +4,13 @@ export class Preview {
 
     name: string;
     img: string;
-    url: string;
+    uuid: string;
 
-    constructor(name: string, img: string, url: string) {
+    constructor(name: string, img: string, uuid: string) {
 
         this.name = name;
         this.img = img;
-        this.url = url;
+        this.uuid = uuid;
         
     }
 }
